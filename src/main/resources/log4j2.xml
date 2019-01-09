@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="MyApp" packages="" shutdownHook="disable">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %highlight{%p} [%c{3.}] %m%n"/>
+        </Console>
+        <Console name="ConsoleIotEngine" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %highlight{%p} [%c{3.}] %highlight{%m{ansi}}%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="kafkastreams.iot" level="info" additivity="false">
+            <AppenderRef ref="ConsoleIotEngine"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

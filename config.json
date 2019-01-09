@@ -1,0 +1,11 @@
+{
+  "stream.application.id": "iot-engine",
+  "stream.application.server": "192.168.1.104:5757",
+  "stream.bootstrap.servers": "192.168.1.104:9092",
+  "stream.num.stream.threads": "1",
+  "stream.default.timestamp.extractor": "org.apache.kafka.streams.processor.WallclockTimestampExtractor",
+  "topic.data": "iot-data",
+  "topic.alert": "alerts",
+  "topic.rule": "rules",
+  "topic.agg": "iot-agg-data"
+}
