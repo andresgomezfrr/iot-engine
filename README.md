@@ -92,6 +92,28 @@ Full example:
 
 ## Docker
 
+Enviroment Vars:
+
+| ENV  | Description  | Default Value  | Example |
+|---|---|---|---|
+|  BOOTSTRAP_SERVERS |  Kafka servers | -  | `locahost:9092`|  
+|  APPLICATION_ID |  Indetify the app. It is used to create consumer groups | `iot-engine-app`  | `iot-engine-app` |    
+|  REST_SERVER_ENDPOINT |  Host and port where the REST Service perform the binding | `0.0.0.0:5577`  |    `0.0.0.0:5577` |
+|  TOPIC_AGG |  Topic to send aggregation metrics | `agg-metrics`  |    `agg-metrics` |
+|  TOPIC_DATA |  Topic to receive input metrics  | `data`  |    `data`  |    
+|  TOPIC_RULE |  Topic to receive rules  | `rules`  |    `rules`  |    
+|  TOPIC_ALERTS |  Topic to send alerts  | `alerts`  |    `alerts`  |    
+|  APPLICATION_SERVER |  Host and port to advertise the KStream APP | - | `127.0.0.1:5577`  |
+|  NUM_STREAM_THREADS |  The kafka streams thredas | `1`  |    `1` |
+|  LOG_LEVEL |  Iot Engine log level | `info`  |  `info` | 
+|  ROOT_LOG_LEVEL |  Other dependencies log level | `info`  |  `info` | 
+|  JVM_OPTIONS |  java properties to configure the JVM | `"-Xmx512m -Xms512m"`  | `"-Xmx512m -Xms512m"` |
+
+Sample usage:
+
+```
+docker run -it -p 5574:5574 -e BOOTSTRAP_SERVERS=172.20.10.5:9092 -e APPLICATION_ID=iot-engine -e REST_SERVER_ENDPOINT=0.0.0.0:5574 -e TOPIC_AGG=iot-agg-data -e TOPIC_DATA=iot-data -e APPLICATION_SERVER=172.20.10.5:5574 iot-engine:latest
+```
 
 ## Compiling Sources
 
