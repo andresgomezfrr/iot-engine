@@ -11,7 +11,7 @@
 
     <properties>
         <kafka.version>2.1.0</kafka.version>
-        <jackson.version>2.9.5</jackson.version>
+        <jackson.version>2.9.8</jackson.version>
         <log4j-slf4j-impl.verion>2.11.0</log4j-slf4j-impl.verion>
         <jersey.version>2.27</jersey.version>
         <jetty.version>9.4.12.v20180830</jetty.version>
