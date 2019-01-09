@@ -1,0 +1,12 @@
+{
+  "stream.application.id": "${APPLICATION_ID}",
+  "stream.bootstrap.servers": "${BOOTSTRAP_SERVERS}",
+  "stream.application.server": "${APPLICATION_SERVER}",
+  "stream.num.stream.threads": "${NUM_STREAM_THREADS}",
+  "rest.server.endpoint": "${REST_SERVER_ENDPOINT}",
+  "stream.default.timestamp.extractor": "org.apache.kafka.streams.processor.WallclockTimestampExtractor",
+  "topic.data": "${TOPIC_DATA}",
+  "topic.alert": "${TOPIC_ALERT}",
+  "topic.rule": "${TOPIC_RULE}",
+  "topic.agg": "${TOPIC_AGG}"
+}

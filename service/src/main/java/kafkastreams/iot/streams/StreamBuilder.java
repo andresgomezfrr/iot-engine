@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class StreamBuilder {
     private static final Logger log = LoggerFactory.getLogger(StreamBuilder.class);
     public static final String RULES_STORE_NAME = "rules";
-    public static final String AGG_STORE_NAME = "agg";
+    public static final String AGG_STORE_NAME = "agg-metrics";
 
     public static Topology getStreamToplogy(String inTopic, String rulesTopic, String alertTopic, String aggTopic) {
         StreamsBuilder builder = new StreamsBuilder();

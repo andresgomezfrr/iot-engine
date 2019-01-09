@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="MyApp" packages="" shutdownHook="disable">
+    <Appenders>
+        <File name="FileLog" fileName="/var/log/iot-engine/iot-engine.log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight{%p} [%c{3.}] %m%n</Pattern>
+            </PatternLayout>
+        </File>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %highlight{%p} [%c{3.}] %m%n"/>
+        </Console>
+        <File name="FileLogIotEngine" fileName="/var/log/iot-engine/iot-engine.log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight{%p} [%c{3.}] %highlight{%m{ansi}}%n</Pattern>
+            </PatternLayout>
+        </File>
+        <Console name="ConsoleIotEngine" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %highlight{%p} [%c{3.}] %highlight{%m{ansi}}%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="kafkastreams.iot" level="${LOG_LEVEL}" additivity="false">
+            <AppenderRef ref="FileLogIotEngine"/>
+            <AppenderRef ref="ConsoleIotEngine"/>
+        </Logger>
+        <Root level="${GENERAL_LOG_LEVEL}">
+            <AppenderRef ref="FileLog"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

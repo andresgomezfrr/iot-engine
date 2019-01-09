@@ -18,6 +18,7 @@ package kafkastreams.iot.restserver;
 import kafkastreams.iot.model.IotDataMessage;
 import kafkastreams.iot.model.IotSensorRules;
 import kafkastreams.iot.streams.IotDataAggregator;
+import kafkastreams.iot.streams.StreamBuilder;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyValue;
@@ -50,16 +51,18 @@ public class RestService {
 
     private final KafkaStreams streams;
     private final MetadataService metadataService;
-    private final HostInfo hostInfo;
+    private final HostInfo appServer;
+    private final HostInfo restServer;
     private final Client client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
     private Server jettyServer;
     private static final Logger log = LoggerFactory.getLogger(RestService.class);
 
 
-    public RestService(final KafkaStreams streams, final HostInfo hostInfo) {
+    public RestService(final KafkaStreams streams, final HostInfo appServer, final HostInfo restServer) {
         this.streams = streams;
         this.metadataService = new MetadataService(streams);
-        this.hostInfo = hostInfo;
+        this.appServer = appServer;
+        this.restServer = restServer;
     }
 
     /**
@@ -75,10 +78,34 @@ public class RestService {
     public IotSensorRules queryRules(@PathParam("id") final String id) {
         IotSensorRules rules;
 
-        try {
-            rules = requestData("rules", id);
-        } catch (NotFoundException ex) {
-            rules = new IotSensorRules(id, Collections.EMPTY_LIST);
+        // The data might be hosted on another instance. We need to find which instance it is on
+        // and then perform a remote lookup if necessary.
+        final HostStoreInfo
+                host =
+                metadataService.streamsMetadataForStoreAndKey(StreamBuilder.RULES_STORE_NAME, id, new
+                        StringSerializer());
+
+        // data is on another instance. call the other instance to fetch the data.
+        if (!thisHost(host)) {
+            String remoteHost = String.format("http://%s:%d/%s",
+                    host.getHost(), host.getPort(), "iot-engine/query/" + StreamBuilder.RULES_STORE_NAME + "/" + id
+            );
+            log.info("Finding sensor {} rules, on instance {}", id, remoteHost);
+            rules = client
+                    .target(remoteHost)
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .get(new GenericType<IotSensorRules>() {
+                    });
+        } else {
+            log.info("Finding sensor {} rules, on local state", id);
+            // look in the local store
+            final ReadOnlyKeyValueStore<String, IotSensorRules> store = streams.store(StreamBuilder.RULES_STORE_NAME,
+                    QueryableStoreTypes.keyValueStore());
+            rules = store.get(id);
+            if (rules == null) {
+                rules = new IotSensorRules(id, Collections.EMPTY_LIST);
+            }
+
         }
 
         return rules;
@@ -88,9 +115,9 @@ public class RestService {
      * Get the rules for specific sensor
      * has the provided store.
      *
-     * @param id The sensor id
+     * @param id    The sensor id
      * @param start start time, example: 2007-12-03T10:15:30.00Z
-     * @param end end time, example: 2007-12-03T10:15:30.00Z
+     * @param end   end time, example: 2007-12-03T10:15:30.00Z
      * @return Rules of {@link Map<String,Object>}
      */
     @GET()
@@ -110,8 +137,22 @@ public class RestService {
         List<IotDataMessage> result = new ArrayList<>();
 
         if (!thisHost(host)) {
-            result.addAll(redirectRequest(host, "iot-engine/metrics/" + id + "/" + start + "/" + end));
+            String remoteHost = String.format("http://%s:%d/%s",
+                    host.getHost(),
+                    host.getPort(),
+                    "iot-engine/query/metrics/" + id + "/" + start + "/" + end
+            );
+
+            log.info("Finding sensor {} agg metrics, on instance {}", id, remoteHost);
+            result.addAll(
+                    client
+                            .target(remoteHost)
+                            .request(MediaType.APPLICATION_JSON_TYPE)
+                            .get(new GenericType<List<IotDataMessage>>() {
+                            })
+            );
         } else {
+            log.info("Finding sensor {} agg metrics, on local state", id);
             ReadOnlyWindowStore<String, IotDataAggregator> windowStore =
                     streams.store(AGG_STORE_NAME, QueryableStoreTypes.windowStore());
 
@@ -154,44 +195,9 @@ public class RestService {
         return metadataService.streamsMetadataForStore(store);
     }
 
-    private <T> T requestData(String storeName, String id) {
-        // The data might be hosted on another instance. We need to find which instance it is on
-        // and then perform a remote lookup if necessary.
-        final HostStoreInfo
-                host =
-                metadataService.streamsMetadataForStoreAndKey(storeName, id, new
-                        StringSerializer());
-
-        T result;
-
-        // data is on another instance. call the other instance to fetch the data.
-        if (!thisHost(host)) {
-            result = redirectRequest(host, "iot-engine/query/" + storeName + "/" + id);
-        } else {
-            // look in the local store
-            final ReadOnlyKeyValueStore<String, T> store = streams.store(storeName,
-                    QueryableStoreTypes.keyValueStore());
-            result = store.get(id);
-            if (result == null) {
-                throw new NotFoundException(String.format("Result with id [%d] was not found", result));
-            }
-
-        }
-
-        return result;
-    }
-
     private boolean thisHost(final HostStoreInfo host) {
-        return host.getHost().equals(hostInfo.host()) &&
-                host.getPort() == hostInfo.port();
-    }
-
-
-    private <T> T redirectRequest(final HostStoreInfo host, final String path) {
-        return client.target(String.format("http://%s:%d/%s", host.getHost(), host.getPort(), path))
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .get(new GenericType<T>() {
-                });
+        return host.getHost().equals(appServer.host()) &&
+                host.getPort() == appServer.port();
     }
 
     /**
@@ -215,8 +221,8 @@ public class RestService {
         context.addServlet(holder, "/*");
 
         final ServerConnector connector = new ServerConnector(jettyServer);
-        connector.setHost(hostInfo.host());
-        connector.setPort(hostInfo.port());
+        connector.setHost(restServer.host());
+        connector.setPort(restServer.port());
         jettyServer.addConnector(connector);
 
         context.start();
@@ -224,7 +230,7 @@ public class RestService {
         try {
             jettyServer.start();
         } catch (final java.net.SocketException exception) {
-            log.error("Unavailable: " + hostInfo.host() + ":" + hostInfo.port());
+            log.error("Unavailable: " + restServer.host() + ":" + restServer.port());
             throw new Exception(exception.toString());
         }
     }

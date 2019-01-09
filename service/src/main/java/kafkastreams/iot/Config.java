@@ -34,6 +34,10 @@ public class Config {
         return streamProperties;
     }
 
+    public void addStreamProperty(String propertyName, String propertyValue) {
+        streamProperties.put(propertyName, propertyValue);
+    }
+
     public String getDataTopic() {
         return (String) config.getOrDefault("topic.data", "data");
     }
