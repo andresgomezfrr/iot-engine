@@ -89,6 +89,9 @@ Full example:
 |  metricValue |  The metric value that is inside of IotDataMessage.Metrics | INTEGER  |  `22` |   
 |  condition |  The condition to compare. `==` `!=` `<` `>` `>=` `<=` | STRING  |  `"<"` |   
 
+## Rest Service
+
+TODO
 
 ## Docker
 
@@ -115,7 +118,9 @@ Sample usage:
 docker run -it -p 5574:5574 -e BOOTSTRAP_SERVERS=172.20.10.5:9092 -e APPLICATION_ID=iot-engine -e REST_SERVER_ENDPOINT=0.0.0.0:5574 -e TOPIC_AGG=iot-agg-data -e TOPIC_DATA=iot-data -e APPLICATION_SERVER=172.20.10.5:5574 iot-engine:latest
 ```
 
-## Compiling Sources
+## Development
+
+### Compiling Sources
 
 To build this project you can use `maven` tool. 
 
@@ -143,7 +148,7 @@ If you want to build the docker image, make sure that you have the docker servic
 mvn clean package -P docker
 ```
 
-## Contributing
+### Contributing
 
 1. [Fork it](https://github.com/andresgomezfrr/iot-engine/fork)
 2. Create your feature branch: `git checkout -b my-new-feature`
