@@ -90,6 +90,8 @@ public class StreamBuilder {
                 .flatMap((key, value) -> value.stream().map(v -> new KeyValue<>(key, v)).collect(Collectors.toList()))
                 .to(alertTopic, Produced.with(Serdes.String(), new IotSerde<>(IotAlertMessage.class)));
 
+        // TODO: Build control stream based on alert stream
+
         // Build metric storage stream
         KGroupedStream<String, IotDataMessage> groupedByData = partitionedInStream
                 .groupBy((key, word) -> key, Grouped.with(Serdes.String(), iotDataMessageSerde));
@@ -114,11 +116,12 @@ public class StreamBuilder {
                                         )
                                 )
                 )
+                // TODO: Change output format to split metrics inside multiple messages
                 .to(aggTopic, Produced.with(Serdes.String(), new IotSerde<>(IotDataMessage.class)));
 
-        // Add stream with static data context
+        // TODO: Add stream with static data context
 
-        // Add stream with latest metric data
+        // TODO: Add stream with latest metric data
 
         return builder.build();
     }
