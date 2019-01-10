@@ -33,7 +33,7 @@ Full example:
 | Field  | Description  | Type  | Example |
 |---|---|---|---|
 |  id |  The ID to identify a speficic IoT sensor | STRING  |  `"A"` |   
-|  rules | Rules to verify by IoT sensor [  |  ARRAY[[IotSensorRule](https://github.com/andresgomezfrr/iot-engine/blob/master/service/src/main/java/kafkastreams/iot/model/IotSensorRule.java)] | `[{"ruleName":"min_humidity","metricName":"hum","metricValue":50,"condition":"<"}]`|   
+|  rules | Rules to verify by IoT sensor |  ARRAY[[IotSensorRule](https://github.com/andresgomezfrr/iot-engine/blob/master/service/src/main/java/kafkastreams/iot/model/IotSensorRule.java)] | `[{"ruleName":"min_humidity","metricName":"hum","metricValue":50,"condition":"<"}]`|   
 
 Full example:
 
