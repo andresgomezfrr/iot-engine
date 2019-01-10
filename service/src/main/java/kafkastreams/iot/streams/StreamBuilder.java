@@ -105,7 +105,6 @@ public class StreamBuilder {
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(new IotSerde<>(IotDataAggregator.class))
                 )
-                .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()))
                 .toStream()
                 .map(
                         (key, value) ->
