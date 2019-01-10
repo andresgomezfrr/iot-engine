@@ -125,7 +125,7 @@ Enviroment Vars:
 |  TOPIC_AGG |  Topic to send aggregation metrics | `agg-metrics`  |    `agg-metrics` |
 |  TOPIC_DATA |  Topic to receive input metrics  | `data`  |    `data`  |    
 |  TOPIC_RULE |  Topic to receive rules  | `rules`  |    `rules`  |    
-|  TOPIC_ALERTS |  Topic to send alerts  | `alerts`  |    `alerts`  |    
+|  TOPIC_ALERT |  Topic to send alerts  | `alerts`  |    `alerts`  |    
 |  APPLICATION_SERVER |  Host and port to advertise the KStream APP | - | `127.0.0.1:5577`  |
 |  NUM_STREAM_THREADS |  The kafka streams thredas | `1`  |    `1` |
 |  LOG_LEVEL |  Iot Engine log level | `info`  |  `info` | 
