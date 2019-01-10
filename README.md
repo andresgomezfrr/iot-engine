@@ -109,7 +109,7 @@ Enviroment Vars:
 |  APPLICATION_SERVER |  Host and port to advertise the KStream APP | - | `127.0.0.1:5577`  |
 |  NUM_STREAM_THREADS |  The kafka streams thredas | `1`  |    `1` |
 |  LOG_LEVEL |  Iot Engine log level | `info`  |  `info` | 
-|  ROOT_LOG_LEVEL |  Other dependencies log level | `info`  |  `info` | 
+|  GENERAL_LOG_LEVEL |  Other dependencies log level | `info`  |  `info` |
 |  JVM_OPTIONS |  java properties to configure the JVM | `"-Xmx512m -Xms512m"`  | `"-Xmx512m -Xms512m"` |
 
 Sample usage:

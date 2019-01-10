@@ -58,7 +58,7 @@ public class StreamBuilder {
         partitionedInStream
                 .leftJoin(rulesTable, (message, rules) -> {
                     List<IotAlertMessage> alerts = new ArrayList<>();
-                    log.info("Processing message {} with rules {} :", message, rules);
+                    log.debug("Processing message {} with rules {} :", message, rules);
 
                     if (message != null && rules != null) {
                         Map<String, Integer> metrics = message.getMetrics();
@@ -67,7 +67,7 @@ public class StreamBuilder {
                             for (IotSensorRule rule : rules.getRules()) {
                                 if (metrics.containsKey(rule.getMetricName())) {
                                     Integer metricValue = metrics.get(rule.getMetricName());
-                                    log.info(" * Processing message {} with rule {}", message, rule);
+                                    log.debug(" * Processing message {} with rule {}", message, rule);
                                     if (rule.eval(metricValue)) {
                                         alerts.add(new IotAlertMessage(
                                                         rules.getId(), rule.getMetricName(), rule.getRuleName(),
@@ -105,6 +105,7 @@ public class StreamBuilder {
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(new IotSerde<>(IotDataAggregator.class))
                 )
+                .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()))
                 .toStream()
                 .map(
                         (key, value) ->

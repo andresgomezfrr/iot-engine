@@ -90,14 +90,14 @@ public class RestService {
             String remoteHost = String.format("http://%s:%d/%s",
                     host.getHost(), host.getPort(), "iot-engine/query/" + StreamBuilder.RULES_STORE_NAME + "/" + id
             );
-            log.info("Finding sensor {} rules, on instance {}", id, remoteHost);
+            log.debug("Finding sensor {} rules, on instance {}", id, remoteHost);
             rules = client
                     .target(remoteHost)
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .get(new GenericType<IotSensorRules>() {
                     });
         } else {
-            log.info("Finding sensor {} rules, on local state", id);
+            log.debug("Finding sensor {} rules, on local state", id);
             // look in the local store
             final ReadOnlyKeyValueStore<String, IotSensorRules> store = streams.store(StreamBuilder.RULES_STORE_NAME,
                     QueryableStoreTypes.keyValueStore());
@@ -143,7 +143,7 @@ public class RestService {
                     "iot-engine/query/metrics/" + id + "/" + start + "/" + end
             );
 
-            log.info("Finding sensor {} agg metrics, on instance {}", id, remoteHost);
+            log.debug("Finding sensor {} agg metrics, on instance {}", id, remoteHost);
             result.addAll(
                     client
                             .target(remoteHost)
@@ -152,7 +152,7 @@ public class RestService {
                             })
             );
         } else {
-            log.info("Finding sensor {} agg metrics, on local state", id);
+            log.debug("Finding sensor {} agg metrics, on local state", id);
             ReadOnlyWindowStore<String, IotDataAggregator> windowStore =
                     streams.store(AGG_STORE_NAME, QueryableStoreTypes.windowStore());
 
