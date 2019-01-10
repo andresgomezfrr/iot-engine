@@ -91,7 +91,27 @@ Full example:
 
 ## Rest Service
 
-TODO
+ * `/iot-engine/query/rules/{id}`
+    * Get the rules for specific sensor has the provided store.
+    * Params:
+        * `id`: String sensor ID
+    * Return: `IotSensorRules`
+    
+ * `/iot-engine/query/metrics/{id}/{start}/{end}`
+    * Get aggregation metrics from specifc sensor and interval
+    * Params:
+        * `id`: String sensor ID
+        * `start`: Start time. *Example: `2018-12-03T10:15:30.00Z`*
+        * `end`: End time. *Example: `2019-12-03T10:15:30.00Z`*
+    * Return: `List<IotDataMessage>`
+    
+ * `/iot-engine/instances`
+    * Get the metadata for all of the instances of this Kafka Streams application
+    * Return: `List<HostStoreInfo>`
+
+ * `/iot-engine/instances/{storeName}`
+    * Get the metadata for all instances of this Kafka Streams application that currently has the provided store.
+    * Return: `List<HostStoreInfo>`
 
 ## Docker
 
