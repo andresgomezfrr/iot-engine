@@ -16,15 +16,20 @@ public class IotDataMessage {
     @JsonProperty("metrics")
     Map<String, Integer> metrics;
 
+    @JsonProperty("context")
+    Map<String, Object> context;
+
     @JsonCreator
     public IotDataMessage(
             @JsonProperty("timestamp") long timestamp,
             @JsonProperty("id") String id,
-            @JsonProperty("metrics") Map<String, Integer> metrics
+            @JsonProperty("metrics") Map<String, Integer> metrics,
+            @JsonProperty("context") Map<String, Object> context
     ) {
         this.timestamp = timestamp;
         this.id = id;
         this.metrics = metrics;
+        this.context = context;
     }
 
     public <T> T getMetrics(String metricName) {
@@ -59,6 +64,16 @@ public class IotDataMessage {
     @JsonProperty
     public void setMetrics(Map<String, Integer> metrics) {
         this.metrics = metrics;
+    }
+
+    @JsonProperty
+    public Map<String, Object> getContext() {
+        return context;
+    }
+
+    @JsonProperty
+    public void setContext(Map<String, Object> context) {
+        this.context = context;
     }
 
     @Override

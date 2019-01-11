@@ -96,7 +96,7 @@ public class StreamBuilder {
         KGroupedStream<String, IotDataMessage> groupedByData = partitionedInStream
                 .groupBy((key, word) -> key, Grouped.with(Serdes.String(), iotDataMessageSerde));
 
-        groupedByData
+        KStream<String, IotDataMessage> aggStream = groupedByData
                 .windowedBy(TimeWindows.of(Duration.ofMinutes(1)))
                 .aggregate(
                         IotDataAggregator::new,
@@ -112,14 +112,32 @@ public class StreamBuilder {
                                         new IotDataMessage(
                                                 key.window().endTime().getEpochSecond(),
                                                 key.key(),
-                                                value.generateAggMetrics()
+                                                value.generateAggMetrics(),
+                                                null
                                         )
                                 )
-                )
-                // TODO: Change output format to split metrics inside multiple messages
-                .to(aggTopic, Produced.with(Serdes.String(), new IotSerde<>(IotDataMessage.class)));
+                );
+
+        //TODO: Change output format to split metrics inside multiple messages
 
         // TODO: Add stream with static data context
+
+        IotSerde mapIotSerde = new IotSerde<>(Map.class);
+
+        KTable<String, Map<String, Object>> contextTable = builder.table("context",
+                Consumed.with(Serdes.String(), mapIotSerde),
+                Materialized.<String, Map<String, Object>, KeyValueStore<Bytes, byte[]>>as("context")
+                        .withKeySerde(Serdes.String())
+                        .withValueSerde(mapIotSerde)
+        );
+
+        aggStream
+                .leftJoin(contextTable, (data, context) -> {
+                    if (context != null && data != null) data.setContext(context);
+                    return data;
+                })
+                .to(aggTopic, Produced.with(Serdes.String(), new IotSerde<>(IotDataMessage.class)));
+
 
         // TODO: Add stream with latest metric data
 
