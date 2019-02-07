@@ -9,6 +9,13 @@
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
+    <scm>
+      <developerConnection>scm:git:git@github.com:andresgomezfrr/iot-engine.git</developerConnection>
+      <connection>scm:git:git@github.com:andresgomezfrr/iot-engine.git</connection>
+      <tag>HEAD</tag>
+      <url>git@github.com:andresgomezfrr/iot-engine.git</url>
+    </scm>
+
     <properties>
         <kafka.version>2.1.0</kafka.version>
         <jackson.version>2.9.8</jackson.version>
