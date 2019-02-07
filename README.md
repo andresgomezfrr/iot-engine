@@ -64,18 +64,19 @@ Full example:
 |  id |  The ID to identify a speficic IoT sensor | STRING  |  `"A"` |   
 |  ruleName |  Rule name's. It is used to indetify the rule | STRING  |  `"Min humidity reached!"` |   
 |  metricName |  The metric name that is inside of IotDataMessage.Metrics | STRING  |  `"hum"` |   
-|  payload |  The condition that was compared. `{metricValue} {condition} {ruleMetricValue}` | STRING  |  `"22 < 45"` |   
-
-Full example:
+|  metricValue |  The metric value that is inside of IotDataMessage.Metrics | INTEGER  |  `22` |   
+|  condition |  The condition to compare. `==` `!=` `<` `>` `>=` `<=` | STRING  |  `"<"` |   
+|  controlAction |  The action to send to control topic by id. *Cloud be `null`* | STRING  |  `"ON"` |   
 
 ```json
-{
-  "id": "A",
-  "metricName": "hum",
-  "ruleName": "min_humidity",
-  "payload": "49 < 50"
-}
+    {
+      "ruleName": "min_humidity",
+      "metricName": "hum",
+      "metricValue": 50,
+      "condition": "<"
+    }
 ```
+
 
 
 ### Alert Message Format
@@ -84,10 +85,33 @@ Full example:
 
 | Field  | Description  | Type  | Example |
 |---|---|---|---|
+|  id |  The ID to identify a speficic IoT sensor | STRING  |  `"A"` |   
 |  ruleName |  Rule name's. It is used to indetify the rule | STRING  |  `"Min humidity reached!"` |   
 |  metricName |  The metric name that is inside of IotDataMessage.Metrics | STRING  |  `"hum"` |   
-|  metricValue |  The metric value that is inside of IotDataMessage.Metrics | INTEGER  |  `22` |   
-|  condition |  The condition to compare. `==` `!=` `<` `>` `>=` `<=` | STRING  |  `"<"` |   
+|  payload |  The condition that was compared. `{metricValue} {condition} {ruleMetricValue}` | STRING  |  `"22 < 45"` |   
+|  controlAction |  The action to send to control topic by id. *Cloud be `null`* | STRING  |  `"ON"` |   
+
+Full example:
+
+```json
+{
+  "id": "A",
+  "metricName": "hum",
+  "ruleName": "min_humidity",
+  "payload": "49 < 50",
+  "controlAction": "ON"
+}
+```
+
+### Control Message Format
+
+* [IotControlMessage](https://github.com/andresgomezfrr/iot-engine/blob/master/service/src/main/java/kafkastreams/iot/model/IotControlMessage.java)
+
+| Field  | Description  | Type  | Example |
+|---|---|---|---|
+|  id |  The ID to identify a speficic IoT sensor | STRING  |  `"A"` |   
+|  controlAction |  The action to send to control topic by id. *Cloud be `null`* | STRING  |  `"ON"` |   
+
 
 ## Rest Service
 
@@ -126,6 +150,7 @@ Enviroment Vars:
 |  TOPIC_DATA |  Topic to receive input metrics  | `data`  |    `data`  |    
 |  TOPIC_RULE |  Topic to receive rules  | `rules`  |    `rules`  |    
 |  TOPIC_ALERT |  Topic to send alerts  | `alerts`  |    `alerts`  |    
+|  TOPIC_CONTROL |  Topic to send control messages | `control`  |    `control`  |    
 |  APPLICATION_SERVER |  Host and port to advertise the KStream APP | - | `127.0.0.1:5577`  |
 |  NUM_STREAM_THREADS |  The kafka streams thredas | `1`  |    `1` |
 |  LOG_LEVEL |  Iot Engine log level | `info`  |  `info` | 

@@ -8,5 +8,6 @@
   "topic.data": "iot-data",
   "topic.alert": "alerts",
   "topic.rule": "rules",
-  "topic.agg": "iot-agg-data"
+  "topic.agg": "iot-agg-data",
+  "topic.control": "control"
 }

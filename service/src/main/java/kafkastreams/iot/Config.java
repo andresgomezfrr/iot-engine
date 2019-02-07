@@ -54,6 +54,10 @@ public class Config {
         return (String) config.getOrDefault("topic.alert", "alert");
     }
 
+    public String getControlTopic() {
+        return (String) config.getOrDefault("topic.control", "control");
+    }
+
     public <T> T getConfig(String configName) {
         return (T) config.get(configName);
     }

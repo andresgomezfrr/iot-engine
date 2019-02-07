@@ -19,6 +19,7 @@ ENV APPLICATION_ID=iot-engine-app \
     TOPIC_ALERT=alerts \
     TOPIC_RULE=rules \
     TOPIC_AGG=agg-metrics \
+    TOPIC_CONTROL=control \
     LOG_LEVEL=info \
     GENERAL_LOG_LEVEL=info \
     REST_SERVER_ENDPOINT="0.0.0.0:5577" \
