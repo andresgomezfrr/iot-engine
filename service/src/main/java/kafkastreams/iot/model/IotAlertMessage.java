@@ -16,17 +16,22 @@ public class IotAlertMessage {
     @JsonProperty
     String payload;
 
+    @JsonProperty("controlAction")
+    String controlAction;
+
     @JsonCreator
     public IotAlertMessage(
             @JsonProperty("id") String id,
             @JsonProperty("metricName") String metricName,
             @JsonProperty("ruleName") String ruleName,
-            @JsonProperty("payload") String payload
+            @JsonProperty("payload") String payload,
+            @JsonProperty("controlAction") String controlAction
     ) {
         this.id = id;
         this.metricName = metricName;
         this.ruleName = ruleName;
         this.payload = payload;
+        this.controlAction = controlAction;
     }
 
     @JsonProperty
@@ -67,5 +72,15 @@ public class IotAlertMessage {
     @JsonProperty
     public void setPayload(String payload) {
         this.payload = payload;
+    }
+
+    @JsonProperty
+    public String getControlAction() {
+        return controlAction;
+    }
+
+    @JsonProperty
+    public void setControlAction(String controlAction) {
+        this.controlAction = controlAction;
     }
 }

@@ -1,9 +1,6 @@
 package kafkastreams.iot.streams;
 
-import kafkastreams.iot.model.IotAlertMessage;
-import kafkastreams.iot.model.IotDataMessage;
-import kafkastreams.iot.model.IotSensorRule;
-import kafkastreams.iot.model.IotSensorRules;
+import kafkastreams.iot.model.*;
 import kafkastreams.iot.model.serders.IotSerde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -27,7 +24,9 @@ public class StreamBuilder {
     public static final String RULES_STORE_NAME = "rules";
     public static final String AGG_STORE_NAME = "agg-metrics";
 
-    public static Topology getStreamToplogy(String inTopic, String rulesTopic, String alertTopic, String aggTopic) {
+    public static Topology getStreamToplogy(String inTopic, String rulesTopic,
+                                            String alertTopic, String aggTopic,
+                                            String controlTopic) {
         StreamsBuilder builder = new StreamsBuilder();
         IotSerde iotDataMessageSerde = new IotSerde<>(IotDataMessage.class);
         IotSerde iotSensorRulesSerde = new IotSerde<>(IotSensorRules.class);
@@ -55,7 +54,7 @@ public class StreamBuilder {
 
         // Build alert stream
 
-        partitionedInStream
+        KStream<String, IotAlertMessage> controlAlertStream = partitionedInStream
                 .leftJoin(rulesTable, (message, rules) -> {
                     List<IotAlertMessage> alerts = new ArrayList<>();
                     log.debug("Processing message {} with rules {} :", message, rules);
@@ -69,14 +68,16 @@ public class StreamBuilder {
                                     Integer metricValue = metrics.get(rule.getMetricName());
                                     log.debug(" * Processing message {} with rule {}", message, rule);
                                     if (rule.eval(metricValue)) {
-                                        alerts.add(new IotAlertMessage(
+                                        alerts.add(
+                                                new IotAlertMessage(
                                                         rules.getId(), rule.getMetricName(), rule.getRuleName(),
                                                         String.format(
                                                                 "%s %s %s",
                                                                 metricValue,
                                                                 rule.getCondition(),
                                                                 rule.getMetricValue()
-                                                        )
+                                                        ),
+                                                        rule.getControlAction()
                                                 )
                                         );
                                     }
@@ -87,10 +88,15 @@ public class StreamBuilder {
 
                     return alerts;
                 })
-                .flatMap((key, value) -> value.stream().map(v -> new KeyValue<>(key, v)).collect(Collectors.toList()))
+                .flatMap((key, value) -> value.stream().map(v -> new KeyValue<>(key, v)).collect(Collectors.toList()));
+
+        controlAlertStream
                 .to(alertTopic, Produced.with(Serdes.String(), new IotSerde<>(IotAlertMessage.class)));
 
-        // TODO: Build control stream based on alert stream
+        controlAlertStream
+                .filter((key, value) -> value.getControlAction() != null)
+                .mapValues(value -> new IotControlMessage(value.getId(), value.getControlAction()))
+                .to(controlTopic, Produced.with(Serdes.String(), new IotSerde<>(IotControlMessage.class)));
 
         // Build metric storage stream
         KGroupedStream<String, IotDataMessage> groupedByData = partitionedInStream

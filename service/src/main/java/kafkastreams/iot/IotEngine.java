@@ -20,7 +20,8 @@ public class IotEngine {
             final KafkaStreams streams = new KafkaStreams(
                     StreamBuilder.getStreamToplogy(
                             config.getDataTopic(), config.getRuleTopic(),
-                            config.getAlertTopic(), config.getAggTopic()
+                            config.getAlertTopic(), config.getAggTopic(),
+                            config.getControlTopic()
                     ),
                     config.getStreamProperties()
             );

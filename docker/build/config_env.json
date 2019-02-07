@@ -8,5 +8,6 @@
   "topic.data": "${TOPIC_DATA}",
   "topic.alert": "${TOPIC_ALERT}",
   "topic.rule": "${TOPIC_RULE}",
-  "topic.agg": "${TOPIC_AGG}"
+  "topic.agg": "${TOPIC_AGG}",
+  "topic.control": "${TOPIC_CONTROL}"
 }
