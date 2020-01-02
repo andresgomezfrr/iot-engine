@@ -26,7 +26,7 @@ public class StreamBuilder {
 
     public static Topology getStreamToplogy(String inTopic, String rulesTopic,
                                             String alertTopic, String aggTopic,
-                                            String controlTopic) {
+                                            String controlTopic, Integer retentionTimeDays) {
         StreamsBuilder builder = new StreamsBuilder();
         IotSerde iotDataMessageSerde = new IotSerde<>(IotDataMessage.class);
         IotSerde iotSensorRulesSerde = new IotSerde<>(IotSensorRules.class);
@@ -110,6 +110,7 @@ public class StreamBuilder {
                         Materialized.<String, IotDataAggregator, WindowStore<Bytes, byte[]>>as(AGG_STORE_NAME)
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(new IotSerde<>(IotDataAggregator.class))
+                                .withRetention(Duration.ofDays(retentionTimeDays))
                 )
                 .toStream()
                 .map(

@@ -58,6 +58,10 @@ public class Config {
         return (String) config.getOrDefault("topic.control", "control");
     }
 
+    public Integer getRetentionTimeDays() {
+        return (Integer) config.getOrDefault("retention.time.days", 7);
+    }
+
     public <T> T getConfig(String configName) {
         return (T) config.get(configName);
     }

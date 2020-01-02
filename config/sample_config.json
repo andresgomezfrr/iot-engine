@@ -9,5 +9,6 @@
   "topic.alert": "alerts",
   "topic.rule": "rules",
   "topic.agg": "iot-agg-data",
-  "topic.control": "control"
+  "topic.control": "control",
+  "retention.time.days": 7
 }
