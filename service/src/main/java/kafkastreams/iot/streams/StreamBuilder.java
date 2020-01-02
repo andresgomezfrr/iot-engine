@@ -122,10 +122,10 @@ public class StreamBuilder {
                                         )
                                 )
                 )
-                // TODO: Change output format to split metrics inside multiple messages
+                // TODO: Change output format to split metrics inside multiple messages. One message per metric.
                 .to(aggTopic, Produced.with(Serdes.String(), new IotSerde<>(IotDataMessage.class)));
 
-        // TODO: Add stream with static data context
+        // TODO: Add stream with static data context ( GlobalKTable ?¿ )
 
         // TODO: Add stream with latest metric data
 
