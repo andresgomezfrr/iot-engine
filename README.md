@@ -115,27 +115,45 @@ Full example:
 
 ## Rest Service
 
- * `/iot-engine/query/rules/{id}`
+ * POST `/iot-engine/query/rules`
+    * update the rules for specific sensor has the provided store.
+    * Params:
+        * `id`: String sensor ID
+    * Payload: `IotSensorRules`
+    * Return: `MessageResponse`
+
+ * PUT `/iot-engine/query/rules/{id}`
+    * update the rules for specific sensor has the provided store.
+    * Params:
+        * `id`: String sensor ID
+    * Payload: `IotSensorRules`
+    * Return: `MessageResponse`
+
+ * GET `/iot-engine/query/rules/{id}`
     * Get the rules for specific sensor has the provided store.
     * Params:
         * `id`: String sensor ID
-    * Return: `IotSensorRules`
+    * Return (200): `IotSensorRules`
+    * Return: `MessageResponse`
     
- * `/iot-engine/query/metrics/{id}/{start}/{end}`
+ * GET `/iot-engine/query/metrics/{id}/{start}/{end}`
     * Get aggregation metrics from specifc sensor and interval
     * Params:
         * `id`: String sensor ID
         * `start`: Start time. *Example: `2018-12-03T10:15:30.00Z`*
         * `end`: End time. *Example: `2019-12-03T10:15:30.00Z`*
-    * Return: `List<IotDataMessage>`
-    
- * `/iot-engine/instances`
-    * Get the metadata for all of the instances of this Kafka Streams application
-    * Return: `List<HostStoreInfo>`
+    * Return (200): `List<IotDataMessage>`
+    * Return: `MessageResponse`
 
- * `/iot-engine/instances/{storeName}`
+ * GET `/iot-engine/instances`
+    * Get the metadata for all of the instances of this Kafka Streams application
+    * Return (200): `List<HostStoreInfo>`
+    * Return: `MessageResponse`
+
+ * GET `/iot-engine/instances/{storeName}`
     * Get the metadata for all instances of this Kafka Streams application that currently has the provided store.
-    * Return: `List<HostStoreInfo>`
+    * Return (200): `List<HostStoreInfo>`
+    * Return: `MessageResponse`
 
 ## Docker
 

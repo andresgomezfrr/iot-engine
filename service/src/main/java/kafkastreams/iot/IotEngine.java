@@ -31,6 +31,7 @@ public class IotEngine {
             String[] appServerEndpoint = ((String) config.getConfig("stream.application.server")).split(":");
             String[] restServerEndpoint = ((String) config.getConfig("rest.server.endpoint")).split(":");
             RestService restService = new RestService(
+                    config,
                     streams,
                     new HostInfo(appServerEndpoint[0], Integer.parseInt(appServerEndpoint[1])),
                     new HostInfo(restServerEndpoint[0], Integer.parseInt(restServerEndpoint[1]))
