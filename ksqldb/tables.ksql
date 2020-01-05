@@ -1,14 +1,23 @@
 # Mensaje prueba:
-# T:{"id":"T","timestamp":1578054358000,"metrics":{"hum":49, "temp":39}}
+# {"id":"T","timestamp":1578054358000,"metrics":{"hum":49, "temp":39}}
 #
 
+SET 'auto.offset.reset' = 'earliest';
+
 # Creando streams
-CREATE STREAM "iot-data" (id VARCHAR, timestamp BIGINT, metrics MAP<STRING,INT>)
+CREATE STREAM "iot-data" (id STRING, timestamp BIGINT, metrics MAP<STRING,INT>)
   WITH (kafka_topic='iot-data',
         value_format='JSON',
         timestamp='timestamp');
 
-CREATE STREAM "iot-alerts" (id VARCHAR, ruleName VARCHAR, payload VARCHAR, controlAction VARCHAR)
+# Repartition stream based on `id` key.
+CREATE STREAM "iot-data-partitioned"
+  WITH(KAFKA_TOPIC='iot-data-partitioned') AS
+  SELECT *
+  FROM "iot-data"
+  PARTITION BY id;
+
+CREATE STREAM "iot-alerts" (id STRING, ruleName STRING, payload STRING, controlAction STRING)
   WITH (kafka_topic='iot-alerts',
         value_format='JSON',
         partitions=4,
@@ -17,19 +26,19 @@ CREATE STREAM "iot-alerts" (id VARCHAR, ruleName VARCHAR, payload VARCHAR, contr
 # Creando tables
 CREATE TABLE "iot-metrics" AS
   SELECT id, ROUND(AVG(metrics['temp'])) AS "temp",  ROUND(AVG(metrics['hum'])) AS "hum"
-  FROM "iot-data" WINDOW TUMBLING (SIZE 1 MINUTE)
+  FROM "iot-data-partitioned" WINDOW TUMBLING (SIZE 1 MINUTE)
   GROUP BY id EMIT CHANGES;
 
 # Creando reglas
 INSERT INTO "iot-alerts"
   SELECT id, 'TemperatureUpper20' AS ruleName, CONCAT(CAST(metrics['temp'] AS STRING), ' > 20') AS payload, 'ON' AS controlAction
-  FROM "iot-data"
+  FROM "iot-data-partitioned"
     WHERE metrics['temp'] > 20
     PARTITION BY id ;
 
 INSERT INTO "iot-alerts"
   SELECT id, 'HumidityLower30' AS ruleName, CONCAT(CAST(metrics['hum'] AS STRING), ' < 30') AS payload, 'OFF' AS controlAction
-  FROM "iot-data"
+  FROM "iot-data-partitioned"
     WHERE metrics['hum'] < 30
     PARTITION BY id ;
 

@@ -5,14 +5,24 @@
 SET 'auto.offset.reset' = 'earliest';
 
 # Creando streams
-CREATE STREAM "iot-data-v1" (id VARCHAR, timestamp BIGINT, metric VARCHAR, value INT)
-  WITH (kafka_topic='iot-data-v1',
+CREATE STREAM "iot-data" (id STRING, timestamp BIGINT, metrics MAP<STRING,INT>)
+  WITH (kafka_topic='iot-data',
         value_format='JSON',
-        timestamp='timestamp',
-        partitions=4,
-        key='id');
+        timestamp='timestamp');
 
-CREATE STREAM "iot-alerts-v1" (id VARCHAR, ruleName VARCHAR, payload VARCHAR, controlAction VARCHAR)
+# Repartition stream based on `id` key.
+CREATE STREAM "iot-data-partitioned"
+  WITH(KAFKA_TOPIC='iot-data-partitioned') AS
+  SELECT * 
+  FROM "iot-data"
+  PARTITION BY id;
+
+# Creando streams
+CREATE STREAM "iot-data-v1" 
+  WITH (kafka_topic='iot-data-v1') AS
+  SELECT id, timestamp, EXPLODE(ENTRIES(metrics, true))->K AS metric, EXPLODE(ENTRIES(metrics, true))->V as value  from "iot-data-partitioned" emit changes;
+
+CREATE STREAM "iot-alerts-v1" (id STRING, ruleName STRING, payload STRING, controlAction STRING)
   WITH (kafka_topic='iot-alerts-v1',
         value_format='JSON',
         partitions=4,
