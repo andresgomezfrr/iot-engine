@@ -1,0 +1,43 @@
+# Mensaje prueba:
+# T:{"id":"T","timestamp":1578054358000,"metric":"hum", "value": 20}
+#
+
+SET 'auto.offset.reset' = 'earliest';
+
+# Creando streams
+CREATE STREAM "iot-data-v1" (id VARCHAR, timestamp BIGINT, metric VARCHAR, value INT)
+  WITH (kafka_topic='iot-data-v1',
+        value_format='JSON',
+        timestamp='timestamp',
+        partitions=4,
+        key='id');
+
+CREATE STREAM "iot-alerts-v1" (id VARCHAR, ruleName VARCHAR, payload VARCHAR, controlAction VARCHAR)
+  WITH (kafka_topic='iot-alerts-v1',
+        value_format='JSON',
+        partitions=4,
+        key='id');
+
+# Creando tables
+CREATE TABLE "iot-metrics-v1" AS
+  SELECT id, metric,  ROUND(AVG(value)) AS "value"
+  FROM "iot-data-v1" WINDOW TUMBLING (SIZE 1 MINUTE)
+  GROUP BY id, metric EMIT CHANGES;
+
+# Creando reglas
+INSERT INTO "iot-alerts-v1"
+  SELECT id, 'TemperatureUpper20' AS ruleName, CONCAT(CAST(value AS STRING), ' > 20') AS payload, 'ON' AS controlAction
+  FROM "iot-data-v1"
+    WHERE metric = 'temp' AND value > 20
+    PARTITION BY id ;
+
+INSERT INTO "iot-alerts-v1"
+  SELECT id, 'HumidityLower30' AS ruleName, CONCAT(CAST(value AS STRING), ' < 30') AS payload, 'OFF' AS controlAction
+  FROM "iot-data-v1"
+    WHERE metric = 'hum' AND value > 20
+    PARTITION BY id ;
+
+
+# Query metrics
+select * from "iot-metrics-v1" WHERE ROWKEY='T|+|temp' AND WINDOWSTART > 1577930000000;
+
