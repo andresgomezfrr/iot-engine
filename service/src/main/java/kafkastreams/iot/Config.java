@@ -59,7 +59,7 @@ public class Config {
     }
 
     public Integer getRetentionTimeDays() {
-        return (Integer) config.getOrDefault("retention.time.days", 7);
+        return Integer.parseInt((String) config.getOrDefault("retention.time.days", "7"));
     }
 
     public <T> T getConfig(String configName) {
