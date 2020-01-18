@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 public class StreamBuilder {
     private static final Logger log = LoggerFactory.getLogger(StreamBuilder.class);
     public static final String RULES_STORE_NAME = "rules";
+    public static final String OUTSIDE_STORE_NAME = "outside";
+    public static final String METADATA_SENSOR_STORE_NAME = "metadata-sensor";
     public static final String AGG_STORE_NAME = "agg-metrics";
 
     public static Topology getStreamToplogy(String inTopic, String rulesTopic,
@@ -30,6 +32,8 @@ public class StreamBuilder {
         StreamsBuilder builder = new StreamsBuilder();
         IotSerde iotDataMessageSerde = new IotSerde<>(IotDataMessage.class);
         IotSerde iotSensorRulesSerde = new IotSerde<>(IotSensorRules.class);
+        IotSerde iotMetadataSensor = new IotSerde<>(IotMetadataSensor.class);
+        IotSerde iotOutsideMetricsSerde = new IotSerde<>(IotOutsideMetrics.class);
 
         KStream<String, IotDataMessage> inStream = builder.stream(
                 inTopic,
@@ -102,7 +106,7 @@ public class StreamBuilder {
         KGroupedStream<String, IotDataMessage> groupedByData = partitionedInStream
                 .groupBy((key, word) -> key, Grouped.with(Serdes.String(), iotDataMessageSerde));
 
-        groupedByData
+        KStream<String, IotDataMessage> groupdMetricsStreams = groupedByData
                 .windowedBy(TimeWindows.of(Duration.ofMinutes(1)))
                 .aggregate(
                         IotDataAggregator::new,
@@ -119,16 +123,38 @@ public class StreamBuilder {
                                         new IotDataMessage(
                                                 key.window().endTime().getEpochSecond(),
                                                 key.key(),
-                                                value.generateAggMetrics()
+                                                null,
+                                                null,
+                                                value.generateAggMetrics(),
+                                                null,
+                                                null
                                         )
                                 )
-                )
+                );
                 // TODO: Change output format to split metrics inside multiple messages. One message per metric.
-                .to(aggTopic, Produced.with(Serdes.String(), new IotSerde<>(IotDataMessage.class)));
 
-        // TODO: Add stream with static data context ( GlobalKTable ?¿ )
+        KTable<String, IotMetadataSensor> metadataSensorTable = builder.table("sensor-metadata",
+                Consumed.with(Serdes.String(), iotMetadataSensor),
+                Materialized.<String, IotSensorRules, KeyValueStore<Bytes, byte[]>>as(METADATA_SENSOR_STORE_NAME)
+                        .withKeySerde(Serdes.String())
+                        .withValueSerde(iotMetadataSensor)
+        );
 
-        // TODO: Add stream with latest metric data
+        KStream<String, IotDataMessage> streamWithMetadata = groupdMetricsStreams.leftJoin(metadataSensorTable,
+                (iotDataMessage, iotMetadataSensor1) -> new IotDataMessage(iotDataMessage, iotMetadataSensor1),
+                Joined.with(Serdes.String(), new IotSerde<>(IotDataMessage.class), new IotSerde<>(IotMetadataSensor.class))
+        );
+
+        GlobalKTable<String, IotOutsideMetrics> outsideMetricsGlobalKTable =  builder.globalTable("weather", Consumed.with(Serdes.String(), iotOutsideMetricsSerde),
+                Materialized.<String, IotSensorRules, KeyValueStore<Bytes, byte[]>>as(OUTSIDE_STORE_NAME)
+                        .withKeySerde(Serdes.String())
+                        .withValueSerde(iotOutsideMetricsSerde));
+
+        streamWithMetadata.leftJoin(outsideMetricsGlobalKTable,
+                (key, value) -> value.getLocation(),
+                (value1, value2) -> new IotDataMessage(value1, value2)
+        ).to(aggTopic, Produced.with(Serdes.String(), new IotSerde<>(IotDataMessage.class)));
+
 
         return builder.build();
     }

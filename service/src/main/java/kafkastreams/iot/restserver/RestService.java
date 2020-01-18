@@ -291,7 +291,7 @@ public class RestService {
                 WindowStoreIterator<IotDataAggregator> iterator = windowStore.fetch(id, timeFrom, timeTo);
                 while (iterator.hasNext()) {
                     KeyValue<Long, IotDataAggregator> next = iterator.next();
-                    result.add(new IotDataMessage(next.key, id, next.value.generateAggMetrics()));
+                    result.add(new IotDataMessage(next.key, id, null, null, next.value.generateAggMetrics(), null, null));
                 }
                 iterator.close();
             }
