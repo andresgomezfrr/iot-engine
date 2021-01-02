@@ -10,7 +10,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <kafka.version>2.4.0</kafka.version>
+        <kafka.version>2.7.0</kafka.version>
         <jackson.version>2.9.8</jackson.version>
         <log4j-slf4j-impl.verion>2.11.0</log4j-slf4j-impl.verion>
         <jersey.version>2.27</jersey.version>

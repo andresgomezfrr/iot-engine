@@ -1,6 +1,20 @@
 # iot-engine
 IoT Engine using Kafka Streams.
 
+## Execute
+
+```bash
+bin/kafka-topics.sh --create --partitions 20 --zookeeper localhost:2181 --replication-factor 1 --topic sensor-iot-agg-metrics
+bin/kafka-topics.sh --create --partitions 20 --zookeeper localhost:2181 --replication-factor 1 --topic sensor-iot
+bin/kafka-topics.sh --create --partitions 20 --zookeeper localhost:2181 --replication-factor 1 --topic iot-rules
+bin/kafka-topics.sh --create --partitions 20 --zookeeper localhost:2181 --replication-factor 1 --topic sensor-iot-alerts
+bin/kafka-topics.sh --create --partitions 20 --zookeeper localhost:2181 --replication-factor 1 --topic sensor-metadata
+```
+
+```bash
+docker run -it -p 5574:5574 -e BOOTSTRAP_SERVERS=192.168.0.33:9092 -e APPLICATION_ID=iot-engine -e REST_SERVER_ENDPOINT=0.0.0.0:5574 -e TOPIC_AGG=sensor-iot-agg-metrics -e TOPIC_DATA=sensor-iot -e TOPIC_RULE=iot-rules -e TOPIC_ALERT=sensor-iot-alerts -e APPLICATION_SERVER=192.168.0.33:5574 iot-engine:latest
+```
+
 ## Data Format
 
 ### Input Data Message Format
