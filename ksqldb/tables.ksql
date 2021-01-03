@@ -17,11 +17,10 @@ CREATE STREAM "iot-data-partitioned"
   FROM "iot-data"
   PARTITION BY id;
 
-CREATE STREAM "iot-alerts" (id STRING, ruleName STRING, payload STRING, controlAction STRING)
+CREATE STREAM "iot-alerts" (id STRING KEY, ruleName STRING, payload STRING, controlAction STRING)
   WITH (kafka_topic='iot-alerts',
         value_format='JSON',
-        partitions=4,
-        key='id');
+        partitions=4);
 
 # Creando tables
 CREATE TABLE "iot-metrics" AS
@@ -44,6 +43,6 @@ INSERT INTO "iot-alerts"
 
 
 # Query metrics
-SELECT * FROM "iot-metrics" WHERE ROWKEY = 'T'AND WINDOWSTART > 1577930000000;
-SELECT * FROM "iot-metrics" WHERE ROWKEY = 'T'AND WINDOWSTART > 1577930000000 AND WINDOWSTART <= 1577930000000;
+SELECT * FROM "iot-metrics" WHERE ID = 'T'AND WINDOWSTART > 1577930000000;
+SELECT * FROM "iot-metrics" WHERE ID = 'T'AND WINDOWSTART > 1577930000000 AND WINDOWSTART <= 1577930000000;
 

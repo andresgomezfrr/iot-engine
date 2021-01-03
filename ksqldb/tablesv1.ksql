@@ -49,5 +49,5 @@ INSERT INTO "iot-alerts-v1"
 
 
 # Query metrics
-select * from "iot-metrics-v1" WHERE ROWKEY='T|+|temp' AND WINDOWSTART > 1577930000000;
+select * from "iot-metrics-v1" WHERE ID='T|+|temp' AND WINDOWSTART > 1577930000000;
 
