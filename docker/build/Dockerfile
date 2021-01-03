@@ -20,6 +20,7 @@ ENV APPLICATION_ID=iot-engine-app \
     TOPIC_RULE=rules \
     TOPIC_AGG=agg-metrics \
     TOPIC_CONTROL=control \
+    TOPIC_SENSOR_METADATA=sensor-metadata \
     RETENTION_TIME_DAYS=7 \
     LOG_LEVEL=info \
     GENERAL_LOG_LEVEL=info \

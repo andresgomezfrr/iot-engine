@@ -54,6 +54,11 @@ public class Config {
         return (String) config.getOrDefault("topic.alert", "alert");
     }
 
+
+    public String getSensorMetadataTopic() {
+        return (String) config.getOrDefault("topic.sensormetadata", "sensor-metadata");
+    }
+
     public String getControlTopic() {
         return (String) config.getOrDefault("topic.control", "control");
     }

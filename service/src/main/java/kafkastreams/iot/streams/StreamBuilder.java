@@ -28,7 +28,7 @@ public class StreamBuilder {
 
     public static Topology getStreamToplogy(String inTopic, String rulesTopic,
                                             String alertTopic, String aggTopic,
-                                            String controlTopic, Integer retentionTimeDays) {
+                                            String controlTopic, String sensorMetadataTopic, Integer retentionTimeDays) {
         StreamsBuilder builder = new StreamsBuilder();
         IotSerde iotDataMessageSerde = new IotSerde<>(IotDataMessage.class);
         IotSerde iotSensorRulesSerde = new IotSerde<>(IotSensorRules.class);
@@ -133,7 +133,7 @@ public class StreamBuilder {
                 );
                 // TODO: Change output format to split metrics inside multiple messages. One message per metric.
 
-        KTable<String, IotMetadataSensor> metadataSensorTable = builder.table("sensor-metadata",
+        KTable<String, IotMetadataSensor> metadataSensorTable = builder.table(sensorMetadataTopic,
                 Consumed.with(Serdes.String(), iotMetadataSensor),
                 Materialized.<String, IotSensorRules, KeyValueStore<Bytes, byte[]>>as(METADATA_SENSOR_STORE_NAME)
                         .withKeySerde(Serdes.String())

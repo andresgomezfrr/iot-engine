@@ -181,6 +181,7 @@ Enviroment Vars:
 |  TOPIC_AGG |  Topic to send aggregation metrics | `agg-metrics`  |    `agg-metrics` |
 |  TOPIC_DATA |  Topic to receive input metrics  | `data`  |    `data`  |    
 |  TOPIC_RULE |  Topic to receive rules  | `rules`  |    `rules`  |    
+|  TOPIC_SENSOR_METADATA |  Topic to receive sensor metadata | `sensor-metadata`  |    `sensor-metadata`  |
 |  TOPIC_ALERT |  Topic to send alerts  | `alerts`  |    `alerts`  |    
 |  TOPIC_CONTROL |  Topic to send control messages | `control`  |    `control`  |    
 |  APPLICATION_SERVER |  Host and port to advertise the KStream APP | - | `127.0.0.1:5577`  |

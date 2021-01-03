@@ -9,6 +9,7 @@
   "topic.alert": "${TOPIC_ALERT}",
   "topic.rule": "${TOPIC_RULE}",
   "topic.agg": "${TOPIC_AGG}",
+  "topic.sensormetadata": "${TOPIC_SENSOR_METADATA}",
   "topic.control": "${TOPIC_CONTROL}",
   "retention.time.days": "${RETENTION_TIME_DAYS}"
 }

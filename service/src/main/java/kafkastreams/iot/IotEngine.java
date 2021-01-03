@@ -21,7 +21,7 @@ public class IotEngine {
                     StreamBuilder.getStreamToplogy(
                             config.getDataTopic(), config.getRuleTopic(),
                             config.getAlertTopic(), config.getAggTopic(),
-                            config.getControlTopic(), config.getRetentionTimeDays()
+                            config.getControlTopic(), config.getSensorMetadataTopic(), config.getRetentionTimeDays()
                     ),
                     config.getStreamProperties()
             );
